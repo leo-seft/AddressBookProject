@@ -11,6 +11,10 @@
     - Read contact
     - Update contact
     - Delete contact
+3.  Create ui:
+    - option for all of CRUD operations with logic
+    - exit
+    - Choice case for the options
 
 Bonuses:
 
