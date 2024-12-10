@@ -15,6 +15,12 @@
     - option for all of CRUD operations with logic
     - exit
     - Choice case for the options
+4.  Add error handling
+    - Database not found
+    - Database connection
+5.  Validation
+    - Create First, Last name and Phone number cannot be empty
+    - phone number must be a number
 
 Bonuses:
 

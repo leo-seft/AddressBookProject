@@ -57,7 +57,7 @@ while (true) {
             addressBook.AddContact(newContact);
             Console.WriteLine("Contact added successfully.");
             break;
-
+            //views contacts
         case 2:
             var contacts = addressBook.GetContacts();
             Console.WriteLine("Contacts:");
@@ -65,7 +65,7 @@ while (true) {
                 Console.WriteLine($"ID: {contact.ID}, Name: {contact.FirstName} {contact.LastName}, Phone: {contact.PhoneNumber}, Email: {contact.Email}, Address: {contact.Address}");
             }
             break;
-
+            // updates contact
         case 3:
             Console.Write("Enter the ID of the contact to update: ");
             if (int.TryParse(Console.ReadLine(), out int updateId)) {
@@ -83,7 +83,7 @@ while (true) {
                 Console.WriteLine("Invalid ID.");
             }
             break;
-
+            //deletes contact
         case 4:
             Console.Write("Enter the ID of the contact to delete: ");
             if (int.TryParse(Console.ReadLine(), out int deleteId)) {
@@ -93,7 +93,7 @@ while (true) {
                 Console.WriteLine("Invalid ID.");
             }
             break;
-
+            //close application
         case 5:
             Console.WriteLine("Exiting Address Book. Goodbye!");
             return;
@@ -109,7 +109,7 @@ static string Prompt(string message) {
     return Console.ReadLine()?.Trim();
         }
     }
-
+        //contact class
     public class Contact {
         public int ID { get; set; }
         public string FirstName { get; set; }
@@ -118,10 +118,44 @@ static string Prompt(string message) {
         public string Email { get; set; }
         public string Address { get; set; }
     }
-
+        //All CRUD commands
     public class AddressBook {
-        // Adding a new contact
+        
+        private const string DatabasePath = "AddressBook.db";
+
+        public void CheckDatabase() {
+                // checks that database is found
+            if (!File.Exists(DatabasePath)) {
+                Console.WriteLine("Error: Database not found. Please ensure the database exists.");
+                Environment.Exit(1);
+            }
+            try {   //checks database connects successfully
+                using (var connection = new SqliteConnection($"Data Source={DatabasePath}")) {
+                    connection.Open();
+                    Console.WriteLine("Database connection successful.");
+                }
+            } catch (Exception ex) {
+                Console.WriteLine("An error occurred while connecting to the database: " + ex.Message);
+                Environment.Exit(1);
+            }
+        }
+
+    
+            // Adding a new contact
         public void AddContact(Contact contact) {
+            //validation
+            // if (string.IsNullOrWhiteSpace(contact.FirstName)) {
+            // Console.WriteLine("Error: First name cannot be null or empty.");
+            // return;
+            // }
+            // if (string.IsNullOrWhiteSpace(contact.LastName)) {
+            // Console.WriteLine("Error: Last name cannot be null or empty.");
+            // return;
+            // }
+            // if (string.IsNullOrWhiteSpace(contact.PhoneNumber)) {
+            // Console.WriteLine("Error: Phone number cannot be null or empty.");
+            // return;
+            // }
             using (var connection = new SqliteConnection("Data Source=AddressBook.db")) {
                 connection.Open();
                 var query = "INSERT INTO Contacts (FirstName, LastName, PhoneNumber, Email, Address) VALUES (@FirstName, @LastName, @PhoneNumber, @Email, @Address)";
