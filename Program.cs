@@ -54,6 +54,7 @@ while (true) {
                 Email = Prompt("Enter email (optional): "),
                 Address = Prompt("Enter address (optional): ")
             };
+            Console.WriteLine(newContact.LastName);
             addressBook.AddContact(newContact);
             Console.WriteLine("Contact added successfully.");
             break;
@@ -85,7 +86,9 @@ while (true) {
             break;
             //deletes contact
         case 4:
-            Console.Write("Enter the ID of the contact to delete: ");
+            // Console.Write("Enter the ID of the contact to delete: ");
+            // int.TryParse(Console.ReadLine(), out int deleteId);
+            // getContactById(deleteId);
             if (int.TryParse(Console.ReadLine(), out int deleteId)) {
                 addressBook.DeleteContact(deleteId);
                 Console.WriteLine("Contact deleted successfully.");
@@ -97,7 +100,16 @@ while (true) {
         case 5:
             Console.WriteLine("Exiting Address Book. Goodbye!");
             return;
-
+        case 6: 
+            Console.Write("Enter the ID of the contact to delete: ");
+            int.TryParse(Console.ReadLine(), out int findId);
+            Contact contact = getContactById(findId);
+            if (contact != null) {
+                Console.WriteLine("Conact found");
+            } else{
+                Console.WriteLine("Contact not found");
+            }
+            break;
         default:
             Console.WriteLine("Invalid choice. Try again.");
             break;
@@ -144,18 +156,18 @@ static string Prompt(string message) {
             // Adding a new contact
         public void AddContact(Contact contact) {
             //validation
-            // if (string.IsNullOrWhiteSpace(contact.FirstName)) {
-            // Console.WriteLine("Error: First name cannot be null or empty.");
-            // return;
-            // }
-            // if (string.IsNullOrWhiteSpace(contact.LastName)) {
-            // Console.WriteLine("Error: Last name cannot be null or empty.");
-            // return;
-            // }
-            // if (string.IsNullOrWhiteSpace(contact.PhoneNumber)) {
-            // Console.WriteLine("Error: Phone number cannot be null or empty.");
-            // return;
-            // }
+            if (string.IsNullOrWhiteSpace(contact.FirstName)) {
+            Console.WriteLine("Error: First name cannot be null or empty.");
+            return;
+            }
+            if (string.IsNullOrWhiteSpace(contact.LastName)) {
+            Console.WriteLine("Error: Last name cannot be null or empty.");
+            return;
+            }
+            if (string.IsNullOrWhiteSpace(contact.PhoneNumber)) {
+            Console.WriteLine("Error: Phone number cannot be null or empty.");
+            return;
+            }
             using (var connection = new SqliteConnection("Data Source=AddressBook.db")) {
                 connection.Open();
                 var query = "INSERT INTO Contacts (FirstName, LastName, PhoneNumber, Email, Address) VALUES (@FirstName, @LastName, @PhoneNumber, @Email, @Address)";
@@ -196,6 +208,18 @@ static string Prompt(string message) {
 
         // Updates a contact via ID
         public void UpdateContact(Contact contact) {
+            if (string.IsNullOrWhiteSpace(contact.FirstName)) {
+            Console.WriteLine("Error: First name cannot be null or empty.");
+            return;
+            }
+            if (string.IsNullOrWhiteSpace(contact.LastName)) {
+            Console.WriteLine("Error: Last name cannot be null or empty.");
+            return;
+            }
+            if (string.IsNullOrWhiteSpace(contact.PhoneNumber)) {
+            Console.WriteLine("Error: Phone number cannot be null or empty.");
+            return;
+            }
             using (var connection = new SqliteConnection("Data Source=AddressBook.db")) {
                 connection.Open();
                 var query = "UPDATE Contacts SET FirstName = @FirstName, LastName = @LastName, PhoneNumber = @PhoneNumber, Email = @Email, Address = @Address WHERE ID = @ID";
@@ -219,6 +243,33 @@ static string Prompt(string message) {
                 using (var command = new SqliteCommand(query, connection)) {
                     command.Parameters.AddWithValue("@ID", id);
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public Contact getContactById(int id) {
+            using (var connection = new SqliteConnection("Data Source=AddressBook.db")){
+                connection.Open();
+                var query = "SELECT * FROM Contacts WHERE ID = @ID";
+                using (var command = new SqliteCommand(query, connection)) {
+                    command.Parameters.AddWithValue("@ID",id);
+                    using (var reader = command.ExecuteReader()) {
+                        if (reader.Read()) {
+                            Contact contact = new Contact{
+                                ID = reader.GetInt32(0),
+                                FirstName = reader.GetString(1),
+                                LastName = reader.GetString(2),
+                                PhoneNumber = reader.GetString(3),
+                                Email = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                Address = reader.IsDBNull(5) ? null : reader.GetString(5),
+                            };
+                            return contact;
+                        }
+                        else
+                        {
+                            return null;
+                        };
+                    }
                 }
             }
         }
