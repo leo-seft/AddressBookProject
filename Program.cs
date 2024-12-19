@@ -11,7 +11,7 @@ namespace TaskManagement
     {
         static void Main()
         {
-            string connectionString = "Data Source=AddressBook.db";
+            string connectionString = "Data Source=AddressBook.db"; //creating database
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -81,17 +81,27 @@ namespace TaskManagement
                         Console.Write("Enter the ID of the contact to update: ");
                         if (int.TryParse(Console.ReadLine(), out int updateId))
                         {
-                            var updatedContact = new Contact
+                            var contactToUpdate = addressBook.GetContactById(updateId);
+                            if (contactToUpdate != null)
                             {
-                                ID = updateId,
-                                FirstName = Prompt("Enter new first name: "),
-                                LastName = Prompt("Enter new last name: "),
-                                PhoneNumber = Prompt("Enter new phone number: "),
-                                Email = Prompt("Enter new email (optional): "),
-                                Address = Prompt("Enter new address (optional): ")
-                            };
-                            addressBook.UpdateContact(updatedContact);
-                            Console.WriteLine("Contact updated successfully.");
+                                var updatedContact = new Contact
+                                {
+                                    ID = updateId,
+                                    FirstName = Prompt($"Enter new first name ({contactToUpdate.FirstName}): ", contactToUpdate.FirstName),
+                                    LastName = Prompt($"Enter new last name ({contactToUpdate.LastName}): ", contactToUpdate.LastName),
+                                    PhoneNumber = Prompt($"Enter new phone number ({contactToUpdate.PhoneNumber}): ", contactToUpdate.PhoneNumber),
+                                    Email = Prompt($"Enter new email (optional) ({contactToUpdate.Email}): ", contactToUpdate.Email),
+                                    Address = Prompt($"Enter new address (optional) ({contactToUpdate.Address}): ", contactToUpdate.Address)
+
+
+                                };
+                                addressBook.UpdateContact(updatedContact);
+                                Console.WriteLine("Contact updated successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Contact not found.");
+                            }
                         }
                         else
                         {
@@ -142,10 +152,11 @@ namespace TaskManagement
                 }
             }
         }
-        static string Prompt(string message)
+        static string Prompt(string message, string defaultValue = "")
         {
             Console.Write(message);
-            return Console.ReadLine()?.Trim();
+            string input = Console.ReadLine() ?? string.Empty;
+            return string.IsNullOrWhiteSpace(input) ? defaultValue : input;
         }
     }
     //contact class
@@ -303,7 +314,7 @@ namespace TaskManagement
             }
         }
 
-        public Contact GetContactById(int id)
+        public Contact GetContactById(int id) // checks if contact ID exists
         {
             using (var connection = new SqliteConnection("Data Source=AddressBook.db"))
             {

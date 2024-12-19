@@ -9,7 +9,7 @@
 2.  Create CRUD options
     - Create contact
     - Read contact
-    - Update contact
+    - Update contact - shows previous value
     - Delete contact
 3.  Create ui:
     - option for all of CRUD operations with logic
@@ -21,8 +21,4 @@
 5.  Validation
     - Create First, Last name and Phone number cannot be empty
     - phone number must be a number
-
-Bonuses:
-
-- Sort
-- Search
+    - checks id exists before updating or deleting
